@@ -58,8 +58,8 @@ class ProgressBar extends HTMLElement {
     #displayRoundedProgressBar(){
         return `
         <div class="rounded-progress-bar">
-        <svg width="250" height="250">
-            <circle r="${this.#circleRadius}" cx="125" cy="125" class="track" fill="none"></circle>
+        <svg width="${parseInt(this.#circleRadius)}" height="${parseInt(this.#circleRadius)}">
+            <circle r="${parseInt(this.#circleRadius)/3}" cx="50" cy="50" class="track" fill="none"></circle>
         </svg>
             <span id='rounded-value'>value</span> 
         </div>`;
@@ -152,8 +152,6 @@ class ProgressBar extends HTMLElement {
         this.#circleRadius = radius;
         this.#circonference = 2 * Math.PI * this.#circleRadius;
     }
-
-
 
 }
 

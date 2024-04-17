@@ -64,7 +64,6 @@
     .rounded-progress-bar{
         border-radius: 100%;
         position : relative;
-        height: var(--progress-bar-height);
 
         .track{
             stroke-width: 5;
