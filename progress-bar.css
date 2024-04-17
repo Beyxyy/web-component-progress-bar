@@ -3,22 +3,35 @@
     --progress-bar-primary-color: #007bff;
     --progress-bar-secondary-color: #d1d1d1;
     --progress-bar-value: 0;
-    --progress-bar-rounded : 0px
+    --progress-bar-rounded : 0px;
+    --progress-bar-nb-steps: 0;
+    --progress-bar-circle-status : 50;
+    --progress-bar-circonference : 0;
 }
 
 
 #progress-container{
     width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    
     .progress-bar{
         min-height: var(--progress-bar-height);
-        background: var(--progress-bar-secondary-color);
         border-radius: var(--progress-bar-border-radius);
         transition: var(--progress-bar-transition);  
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        pointer-events: none;
+        position : relative;
+
+        .progress-bar:last-child(.step){
+            right : 0px;
+        }
+        .progress-bar:first-child{
+            right : 0px;
+        }
         
         .step{
+            position : absolute;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,12 +39,16 @@
             font-size: 12px;
             font-weight: bold;
             height: 100%;
+            pointer-events: none;
+
+            span{
+                pointer-events: none;
+            }
     
             &.completed{
                 background: var(--progress-bar-primary-color);
             }
         }
-
 
         &::after{
             content: '';
@@ -43,23 +60,28 @@
             transition: var(--progress-bar-transition);
         }
 
-        .rounded-progress-bar{
-            border-radius: 100%;
-            position : relative;
-            height: var(--progress-bar-height);
+    }
+    .rounded-progress-bar{
+        border-radius: 100%;
+        position : relative;
+        height: var(--progress-bar-height);
 
-            span{
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
+        .track{
+            stroke-width: 5;
+            stroke: var(--progress-bar-primary-color);
+            fill: none;
+            transform: rotate(270deg);
+            transform-origin: center;
+            stroke-linecap: round;
+            stroke-dasharray: var(--progress-bar-circonference);
+            stroke-dashoffset: var(--progress-bar-circle-status);
         }
-
+                    
+        span{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
     }
-    .progress-bar-fill{
-        width: var(--progress-bar-value);
-    }
-
-    
 }

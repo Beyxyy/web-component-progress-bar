@@ -1,24 +1,28 @@
 class ProgressBar extends HTMLElement {
 
-    static observedAttributes = ['primary-color', 'secondary-color', 'value', "max", "rounded", "height", "steps"]; 
+    static observedAttributes = ['primary-color', 'secondary-color', 'value', "max", "rounded", "height", "steps", "cirlcle-radius"]; 
     
-    #rounded = false;
+    #rounded = "false";
     #max = 100;
     #value = 0;
     #primaryColor = 'blue';
     #secondaryColor = 'grey';
     #height = '20px';
     #steps = {};
-
-    #root = this.shadow.querySelector(':root');
-
+    #root;
+    #circleRadius = 100;
+    #circonference = 2 * Math.PI * this.#circleRadius;
 
     constructor() {
         super();
         this.shadow = this.attachShadow({ mode: 'open' });
-        document.createElement('style').setAttribute('href','./progress-bar.css');
-        this.shadow.appendChild(document.createElement('style'));
-        this.#setHtml();
+        let styles = document.createElement('link');
+        styles.setAttribute('rel', 'stylesheet');
+        styles.setAttribute('href', 'progress-bar.css');
+        this.shadow.innerHTML += this.#setHtml();
+        this.#root = this.shadow.querySelector('#progress-container');
+        this.#customStyle();
+        this.shadow.appendChild(styles);
     }
 
 
@@ -29,33 +33,36 @@ class ProgressBar extends HTMLElement {
             <div class="progress-bar">`;
 
         if(this.#rounded ==='false'){
-            if(this.#steps > 0){
-                for(let i=0; i<this.#steps.length; i++){
-                    html += this.#addStep(this.#steps[i]);
+            console.log(Object.keys(this.#steps).length);
+
+            if(Object.keys(this.#steps).length > 0){
+                for (const [key, value] of Object.entries(this.#steps)) {
+                    html += this.#addStep(value, key);
                 }
             }
         }
         else{
-            this.#displayRoundedProgressBar();
+            html+=this.#displayRoundedProgressBar();
         }
 
         
         html += `</div> </div>`;
-        this.shadow.innerHTML = html;
-        this.#customStyle();
+        return html;
+        
     }
 
     #addStep(step, rank){
-        return `<div class="step${rank}"><p>${step.name}</p></div>`;
+        return `<div class="step step${rank}"><p>${step.name}</p></div>`;
     }
 
     #displayRoundedProgressBar(){
-        let html = `
+        return `
         <div class="rounded-progress-bar">
+        <svg width="250" height="250">
+            <circle r="${this.#circleRadius}" cx="125" cy="125" class="track" fill="none"></circle>
+        </svg>
             <span id='rounded-value'>value</span> 
         </div>`;
-    
-        return html;
     }
 
     #customStyle(){
@@ -63,6 +70,10 @@ class ProgressBar extends HTMLElement {
         this.#root.style.setProperty('--progress-bar-secondary-color', this.#secondaryColor);
         this.#root.style.setProperty('--progress-bar-height', this.#height);
         this.#root.style.setProperty('--progress-bar-value', (this.#value/this.#max)*100);
+        this.#root.style.setProperty('--progress-bar-nb-steps', Object.keys(this.#steps).length);
+        this.#root.style.setProperty('--progress-bar-circle-radius', parseInt(this.#circleRadius));
+        this.#root.style.setProperty('--progress-bar-circonference', this.#circonference);
+        this.#root.style.setProperty('--progress-bar-circle-status', parseInt(this.#value)/parseInt(this.#max) * parseInt(this.#circonference));
 
         if(this.#rounded === 'true'){
             this.#root.style.setProperty('--rounded', '100%');
@@ -92,15 +103,20 @@ class ProgressBar extends HTMLElement {
             if(newValue === 'true' || newValue === 'false'){
                 this.#setRounded(newValue);
             }
-        break;
+            break;
         case 'height':
             this.#setHeight(newValue.toInteger());
-        break;
+            break;
         case 'steps':
             this.#setSteps(newValue);
-        break;
+            break;
+
+        case 'circle-radius':
+            this.#setCircleRadius(newValue);
+            break;
         }
 
+        this.#root.innerHTML = this.#setHtml();
         this.#customStyle();
     }
 
@@ -113,7 +129,7 @@ class ProgressBar extends HTMLElement {
     }
 
     #setValue(value){
-        this.#value = value;
+        this.#value = this.#max - value;
     }
 
     #setMax(max){
@@ -132,4 +148,13 @@ class ProgressBar extends HTMLElement {
         this.#steps = JSON.parse(steps) ?? {};
     }
 
+    #setCircleRadius(radius){
+        this.#circleRadius = radius;
+        this.#circonference = 2 * Math.PI * this.#circleRadius;
+    }
+
+
+
 }
+
+customElements.define('progress-bar', ProgressBar);
